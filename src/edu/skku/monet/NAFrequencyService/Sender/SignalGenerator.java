@@ -49,6 +49,7 @@ public class SignalGenerator {
 	 */
 	public static short[] createComplexWaveBuffer(int[] freq, int sec, int sampleRate){
 		// 16bit arrange
+        int realLength = 0;
 		sec <<= 1;
 		int sampleNum = sec * sampleRate;
 		short[] output = new short[sampleNum];
@@ -56,13 +57,16 @@ public class SignalGenerator {
 		// 각 주파수에 대해 단일 주파수 사인파형을 생성
 		short[][] sinwaveList = new short[freq.length][];
 		for(int i=0; i<freq.length; i++){
-			sinwaveList[i] = createSinWaveBuffer(freq[i], sec, sampleRate);
+            if(freq[i] != 0) {
+                sinwaveList[realLength] = createSinWaveBuffer(freq[i], sec, sampleRate);
+                realLength++;
+            }
 		}
 		// 동일한 시간대의 샘플 데이터의 평균을 구하여 output 배열에 삽입
 		for(int i=0; i<sampleNum; i++){
 			long data = 0;
 			
-			for(int j=0; j<freq.length; j++){
+			for(int j=0; j<realLength; j++){
 				data += sinwaveList[j][i];
 			}
 			//data /= freq.length;
@@ -93,7 +97,7 @@ public class SignalGenerator {
         		Message m = new Message();
         		m.obj = new String[]{"Making soundwave data..", ""};
         		MyActivity.handler.sendMessage(m);
-                int[] freqtmp = new int[15];
+                int[] freqtmp = new int[32];
                 /*
         		int[] freq = new int[15];
         		for(int i=0; i<15; i++){
@@ -115,12 +119,20 @@ public class SignalGenerator {
         		}
         		*/
         		
-        		for(int i=0; i<15; i++){
-        			freqtmp[i] = freq[i];
+        		for(int i=0; i<16; i++){
+                    freqtmp[i] = 18000 + (i*100);
+                    str += "1";
         		}
+                for(int i = 0; i < 16; i++) {
+                    freqtmp[15+i] = freq[i];
+                    if(freq[i] != 0)
+                        str += "1";
+                    else
+                        str += "0";
+                }
         		
         		
-        		short[] signal = SignalGenerator.createComplexWaveBuffer(freqtmp, 5, sampleSize);
+        		short[] signal = SignalGenerator.createComplexWaveBuffer(freqtmp, 15, sampleSize);
         		final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleSize, channel_config, channel_format, signal.length, AudioTrack.MODE_STATIC);
                 audioTrack.write(signal, 0, signal.length);
                 audioTrack.play();

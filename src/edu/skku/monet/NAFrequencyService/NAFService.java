@@ -13,6 +13,9 @@ import edu.skku.monet.NAFrequencyService.Sender.SignalGenerator;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import com.loopj.android.http.*;
+import org.apache.http.Header;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Gyuhyeon
@@ -22,6 +25,7 @@ import java.util.Random;
  */
 public class NAFService extends Service {
 
+    private AsyncHttpClient httpClient = new AsyncHttpClient();
     private AudioListener2 listener;
     public static FFTHandler handler;
 
@@ -68,10 +72,10 @@ public class NAFService extends Service {
             int[] xorResult = new int[4];
 
             for(int i = 0; i < 4; i++) {
-                source[i] = str[i];
-                command[i] = str[4 + i];
-                target[i] = str[8 + i];
-                xor[i] = str[12 + i];
+                source[i] = str[16 + i];
+                command[i] = str[20 + i];
+                target[i] = str[28 + i];
+                xor[i] = str[32 + i];
                 xorResult[i] = source[i] ^ command[i] ^ target[i];
                 if(xor[i] != xorResult[i])
                     return;
@@ -88,6 +92,17 @@ public class NAFService extends Service {
                         break;
                     case Constants.ERROR :
                         retry = 0;
+                        httpClient.get("http://scaa.kr:7000/Device/Status/error?id=", new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+
+                            }
+
+                            @Override
+                            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+
+                            }
+                        });
                         //디바이스 이상. 관련 내용 서버 기록. 사용자 피드백.
                         break;
                     case Constants.REQUEST :
@@ -104,10 +119,32 @@ public class NAFService extends Service {
                        break;
                     case Constants.OK :
                         retry = 0;
+                        httpClient.get("http://scaa.kr:7000/Device/Status/ok?id=", new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+
+                            }
+
+                            @Override
+                            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+
+                            }
+                        });
                         //동작 성공. 관련 내용 서버 기록
                         break;
                     case Constants.NOK :
                         retry = 0;
+                        httpClient.get("http://scaa.kr:7000/Device/Status/nok?id=", new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+
+                            }
+
+                            @Override
+                            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+
+                            }
+                        });
                         //동작 실패. 관련 내용 서버 기록
                         break;
                     case Constants.RETRY :

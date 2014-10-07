@@ -10,7 +10,7 @@ public class Constants {
 
     /* Device IDs */
 
-    public static final int startFreq = 18000;
+    public static final int startFreq = 20000;
     public static final int guardFreq = 100;
     public static final int endFreq = 22000;
 

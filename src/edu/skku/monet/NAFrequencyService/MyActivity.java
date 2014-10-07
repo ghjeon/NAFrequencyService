@@ -12,8 +12,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.loopj.android.http.*;
+import org.apache.http.Header;
 import edu.skku.monet.NAFrequencyService.Receiver.AudioListener2;
 import edu.skku.monet.NAFrequencyService.Sender.SignalGenerator;
+import org.json.*;
 
 import java.nio.ByteBuffer;
 
@@ -23,8 +26,8 @@ public class MyActivity extends Activity {
      */
     private Intent serviceIntent;
 
-    private String deviceId = "S";
-    private Integer deviceCode = Constants.DeviceIds.get(deviceId);
+    private static String deviceId = "S";
+    private static Integer deviceCode = Constants.DeviceIds.get(deviceId);
 
 
     private button serviceButton = null;
@@ -99,6 +102,22 @@ public class MyActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+        httpClient.get("http://scaa.kr:7000/Device/list?lastUpdate=", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    // If the response is JSONObject instead of expected JSONArray
+                    if(response.get("result").toString() == "OK")
+                    {
+
+                    }
+                } catch (JSONException e) {
+
+                }
+
+            }
+        });
 
         serviceIntent = new Intent(this, NAFService.class);
         
